@@ -25,7 +25,7 @@ const cosmosClient = new CosmosClient({
 });
 
 const tenantsContainer = cosmosClient
-  .database(process.env.COSMOS_DB_NAME ?? 'loxo-db')
+  .database(process.env.COSMOS_DB_NAME ?? 'enzan-db')
   .container('tenants');
 
 function hashKey(raw) {
@@ -60,5 +60,5 @@ export async function resolveTenant(authHeader) {
 export function isAdminKey(authHeader) {
   if (!authHeader?.startsWith('Bearer ')) return false;
   const raw = authHeader.slice(7).trim();
-  return raw === (process.env.LOXO_ADMIN_KEY ?? '');
+  return raw === (process.env.ENZAN_ADMIN_KEY ?? '');
 }

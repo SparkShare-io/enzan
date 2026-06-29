@@ -1,5 +1,5 @@
 /**
- * Registers all Loxo MCP tools on the McpServer instance.
+ * Registers all Enzan MCP tools on the McpServer instance.
  *
  * In stdio (single-tenant) mode, namespace is read from COSMOS_CONTAINER.
  * In HTTP mode, namespace is injected per-request by the auth middleware.

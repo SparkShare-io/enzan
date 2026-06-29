@@ -1,4 +1,4 @@
-# Loxo — Roadmap
+# Enzan — Roadmap
 
 ## Phase 1 — MCP-as-a-Service MVP
 
@@ -23,9 +23,9 @@ over HTTP/SSE (MCP 1.0 native) with per-tenant isolation and API key auth.
 Broaden reach beyond MCP-only clients.
 
 - [ ] REST API (`src/http.js` extension) — one REST endpoint per MCP tool, OpenAPI spec
-- [ ] Publish npm package `@sparksharе-io/loxo` for stdio self-hosting
+- [ ] Publish npm package `@sparksharе-io/enzan` for stdio self-hosting
 - [ ] Submit to MCP server registry
-- [ ] Tenant self-service sign-up endpoint (`POST /tenants`) behind LOXO_ADMIN_KEY
+- [ ] Tenant self-service sign-up endpoint (`POST /tenants`) behind ENZAN_ADMIN_KEY
 - [ ] Usage dashboard (simple Next.js page — calls, docs stored, last active)
 - [ ] `find_blindspots` tool implementation (port from AI-Cortex blindspots.js)
 - [ ] `capture_video` tool (YouTube transcript → knowledge extraction pipeline)

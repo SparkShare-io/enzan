@@ -1,16 +1,16 @@
-# Loxo
+# Enzan
 
 **Typed, structured, self-maintaining memory for AI agents.**
 
-Named for *Loxodonta* — the genus of the animal that never forgets.
+Named for 演算 (*enzan*) — Japanese for *computation*. Also 遠山 — the distant mountain you can only see when you have enough memory to look back far.
 
 ---
 
-Most AI memory products are flat vector stores. Loxo is different: a typed, curated, relationship-aware knowledge layer with confidence tracking, provenance, pattern recognition, and maintenance semantics built in. Your agents don't just retrieve — they reason over a cortex that gets sharper over time.
+Most AI memory products are flat vector stores. Enzan is different: a typed, curated, relationship-aware knowledge layer with confidence tracking, provenance, pattern recognition, and maintenance semantics built in. Your agents don't just retrieve — they reason over a cortex that gets sharper over time.
 
-## What makes Loxo different
+## What makes Enzan different
 
-| Capability | Flat vector stores | Loxo |
+| Capability | Flat vector stores | Enzan |
 |---|---|---|
 | Typed documents (`knowledge`, `skill`, `pattern`) | — | ✓ |
 | Confidence + provenance tracking | — | ✓ |
@@ -45,31 +45,31 @@ Connect via any MCP-compatible client (Claude, Cursor, Windsurf, OpenClaw, etc.)
 ## Quickstart
 
 ```bash
-# Install the Loxo MCP server
-npx @sparksharе-io/loxo
+# Install the Enzan MCP server
+npx @sparksharе-io/enzan
 
 # Or add to your MCP config manually:
 {
   "mcpServers": {
-    "loxo": {
+    "enzan": {
       "command": "npx",
-      "args": ["@sparksharе-io/loxo"],
+      "args": ["@sparksharе-io/enzan"],
       "env": {
-        "LOXO_API_KEY": "lx_your_key_here"
+        "ENZAN_API_KEY": "ez_your_key_here"
       }
     }
   }
 }
 ```
 
-Get your API key at [loxo.ai](https://loxo.ai) — free tier available.
+Get your API key at [enzan.ai](https://enzan.ai) — free tier available.
 
 ## Architecture
 
 ```
 AI Agent (Claude, GPT, etc.)
     ↓ MCP over HTTP/SSE
-Loxo Gateway
+Enzan Gateway
     ↓ API key → tenant namespace
 Azure Cosmos DB (per-tenant container)
     ↓
@@ -78,11 +78,11 @@ Azure OpenAI (embeddings)
 
 ## Self-hosted
 
-Loxo runs on any Node.js host with a Cosmos DB backend.
+Enzan runs on any Node.js host with a Cosmos DB backend.
 
 ```bash
-git clone https://github.com/SparkShare-io/loxo
-cd loxo
+git clone https://github.com/SparkShare-io/enzan
+cd enzan
 cp .env.example .env   # fill in your Cosmos + Azure OpenAI credentials
 npm install
 npm start

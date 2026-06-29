@@ -1,11 +1,11 @@
 {
-  "name": "@sparksharе-io/loxo",
+  "name": "@sparksharе-io/enzan",
   "version": "0.1.0",
   "description": "Typed, structured, self-maintaining memory layer for AI agents. MCP-native.",
   "type": "module",
   "main": "src/server.js",
   "bin": {
-    "loxo": "src/server.js"
+    "enzan": "src/server.js"
   },
   "engines": {
     "node": ">=20"
@@ -29,9 +29,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SparkShare-io/loxo.git"
+    "url": "https://github.com/SparkShare-io/enzan.git"
   },
-  "homepage": "https://loxo.ai",
+  "homepage": "https://enzan.ai",
   "dependencies": {
     "@azure/cosmos": "^4.3.0",
     "@modelcontextprotocol/sdk": "^1.12.0",

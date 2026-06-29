@@ -21,7 +21,7 @@ const cosmosClient = new CosmosClient({
   key: process.env.COSMOS_KEY,
 });
 
-const db = cosmosClient.database(process.env.COSMOS_DB_NAME ?? 'loxo-db');
+const db = cosmosClient.database(process.env.COSMOS_DB_NAME ?? 'enzan-db');
 const tenantsContainer = db.container('tenants');
 
 /**
@@ -42,7 +42,7 @@ export function tenantNamespace(tenant) {
 export async function provisionTenant({ name, tier = 'starter' }) {
   const tenantId = randomUUID();
   const namespace = `tenant.${tenantId}`;
-  const rawKey = `lx_${randomUUID().replace(/-/g, '')}`;
+  const rawKey = `ez_${randomUUID().replace(/-/g, '')}`;
   const apiKeyHash = createHash('sha256').update(rawKey).digest('hex');
 
   // Create the Cosmos container for this tenant

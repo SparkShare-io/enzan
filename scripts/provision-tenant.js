@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Provision a new Loxo tenant.
+ * Provision a new Enzan tenant.
  *
  * Usage:
  *   node scripts/provision-tenant.js --name "Acme Corp" --tier starter
