@@ -1,0 +1,21 @@
+node_modules/
+.env
+*.local
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+*.swp
+
+# Build / dist
+dist/
+out/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test output
+coverage/
