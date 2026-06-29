@@ -1,4 +1,5 @@
-# Enzan
+# Enzan 
+## (name is still in progress) this is fomalization of Cognition into an available name / domain
 
 **Typed, structured, self-maintaining memory for AI agents.**
 
