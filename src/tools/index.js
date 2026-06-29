@@ -1,25 +1,16 @@
 /**
  * Registers all Enzan MCP tools on the McpServer instance.
  *
- * In stdio (single-tenant) mode, namespace is read from COSMOS_CONTAINER.
- * In HTTP mode, namespace is injected per-request by the auth middleware.
+ * In stdio (single-tenant) mode, namespace defaults to COSMOS_CONTAINER env var.
+ * In HTTP mode, a per-tenant namespace is passed in and baked into the handlers.
  */
 
 import { z } from 'zod';
 import { recall, upsertDoc, logOp, getDoc } from '../cortex/client.js';
 
-const DEFAULT_NS = process.env.COSMOS_CONTAINER ?? 'cortex';
+export function registerTools(server, { namespace: fixedNs } = {}) {
+  const ns = fixedNs ?? process.env.COSMOS_CONTAINER ?? 'cortex';
 
-/**
- * Helper: get namespace from request context (HTTP) or default (stdio).
- * MCP tool handlers receive a context object; in HTTP mode the auth
- * middleware attaches `context.namespace`.
- */
-function ns(context) {
-  return context?.namespace ?? DEFAULT_NS;
-}
-
-export function registerTools(server) {
   // ── recall ──────────────────────────────────────────────────────────────────
   server.tool(
     'recall',
@@ -31,8 +22,8 @@ export function registerTools(server) {
         .describe('Limit results to a specific doc type'),
       limit: z.number().int().min(1).max(50).optional().default(10),
     },
-    async ({ query, type, limit }, context) => {
-      const results = await recall({ query, type, limit }, ns(context));
+    async ({ query, type, limit }) => {
+      const results = await recall({ query, type, limit }, ns);
       return {
         content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
       };
@@ -60,12 +51,11 @@ export function registerTools(server) {
       }),
       summary: z.string().optional().describe('Log entry summary'),
     },
-    async ({ doc, summary }, context) => {
-      const namespace = ns(context);
-      const saved = await upsertDoc({ ...doc, type: 'knowledge' }, namespace);
+    async ({ doc, summary }) => {
+      const saved = await upsertDoc({ ...doc, type: 'knowledge' }, ns);
       await logOp(
         { action: 'store_knowledge', targetType: 'knowledge', targetId: doc.id, summary },
-        namespace,
+        ns,
       );
       return { content: [{ type: 'text', text: JSON.stringify(saved, null, 2) }] };
     },
@@ -86,12 +76,11 @@ export function registerTools(server) {
       }),
       summary: z.string().optional(),
     },
-    async ({ doc, summary }, context) => {
-      const namespace = ns(context);
-      const saved = await upsertDoc({ ...doc, type: 'skill' }, namespace);
+    async ({ doc, summary }) => {
+      const saved = await upsertDoc({ ...doc, type: 'skill' }, ns);
       await logOp(
         { action: 'store_skill', targetType: 'skill', targetId: doc.id, summary },
-        namespace,
+        ns,
       );
       return { content: [{ type: 'text', text: JSON.stringify(saved, null, 2) }] };
     },
@@ -117,12 +106,11 @@ export function registerTools(server) {
       }),
       summary: z.string().optional(),
     },
-    async ({ doc, summary }, context) => {
-      const namespace = ns(context);
-      const saved = await upsertDoc({ ...doc, type: 'pattern' }, namespace);
+    async ({ doc, summary }) => {
+      const saved = await upsertDoc({ ...doc, type: 'pattern' }, ns);
       await logOp(
         { action: 'store_pattern', targetType: 'pattern', targetId: doc.id, summary },
-        namespace,
+        ns,
       );
       return { content: [{ type: 'text', text: JSON.stringify(saved, null, 2) }] };
     },
@@ -138,9 +126,8 @@ export function registerTools(server) {
       sourceVideoId: z.string().optional(),
       notes: z.string().optional(),
     },
-    async ({ patternId, subject, subjectId, sourceVideoId, notes }, context) => {
-      const namespace = ns(context);
-      const pattern = await getDoc(patternId, 'pattern', namespace);
+    async ({ patternId, subject, subjectId, sourceVideoId, notes }) => {
+      const pattern = await getDoc(patternId, 'pattern', ns);
       if (!pattern) {
         return {
           content: [{ type: 'text', text: `Pattern not found: ${patternId}` }],
@@ -156,7 +143,6 @@ export function registerTools(server) {
         addedAt: new Date().toISOString(),
       };
 
-      // Deduplicate by (subjectId, sourceVideoId)
       const existing = pattern.examples ?? [];
       const isDup = existing.some(
         (e) => e.subjectId === subjectId && e.sourceVideoId === sourceVideoId,
@@ -164,7 +150,7 @@ export function registerTools(server) {
 
       if (!isDup) {
         pattern.examples = [...existing, example];
-        await upsertDoc(pattern, namespace);
+        await upsertDoc(pattern, ns);
         await logOp(
           {
             action: 'add_pattern_example',
@@ -172,7 +158,7 @@ export function registerTools(server) {
             targetId: patternId,
             summary: `Added example: ${subject ?? subjectId}`,
           },
-          namespace,
+          ns,
         );
       }
 
@@ -199,12 +185,11 @@ export function registerTools(server) {
       frame: z.string().optional(),
       producedIds: z.array(z.string()).optional(),
     },
-    async ({ text, sessionId, move, frame, producedIds }, context) => {
-      const namespace = ns(context);
+    async ({ text, sessionId, move, frame, producedIds }) => {
       const ts = new Date().toISOString();
       const id = `question:${ts}-${Math.random().toString(36).slice(2, 8)}`;
       const doc = { id, type: 'question', text, askedAt: ts, sessionId, move, frame, producedIds };
-      await upsertDoc(doc, namespace);
+      await upsertDoc(doc, ns);
       return { content: [{ type: 'text', text: `Logged: ${id}` }] };
     },
   );
@@ -217,15 +202,14 @@ export function registerTools(server) {
       summary: z.string().optional(),
       log: z.boolean().optional().default(true),
     },
-    async ({ doc, summary, log: shouldLog }, context) => {
-      const namespace = ns(context);
+    async ({ doc, summary, log: shouldLog }) => {
       if (!doc.id || !doc.type) {
         return {
           content: [{ type: 'text', text: 'doc must include id and type fields' }],
           isError: true,
         };
       }
-      const saved = await upsertDoc(doc, namespace);
+      const saved = await upsertDoc(doc, ns);
       if (shouldLog) {
         await logOp(
           {
@@ -234,7 +218,7 @@ export function registerTools(server) {
             targetId: String(doc.id),
             summary,
           },
-          namespace,
+          ns,
         );
       }
       return { content: [{ type: 'text', text: JSON.stringify(saved, null, 2) }] };

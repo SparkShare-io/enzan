@@ -20,18 +20,12 @@ import { registerTools } from './tools/index.js';
 const transport = process.env.ENZAN_TRANSPORT ?? 'stdio';
 
 async function main() {
-  const server = new McpServer({
-    name: 'enzan',
-    version: '0.1.0',
-  });
-
-  registerTools(server);
-
   if (transport === 'http') {
-    // HTTP/SSE multi-tenant transport — Phase 1 implementation
     const { startHttpServer } = await import('./http.js');
-    await startHttpServer(server);
+    await startHttpServer();
   } else {
+    const server = new McpServer({ name: 'enzan', version: '0.1.0' });
+    registerTools(server);
     const stdioTransport = new StdioServerTransport();
     await server.connect(stdioTransport);
   }
